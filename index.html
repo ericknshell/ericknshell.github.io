@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Erick Adriano — Analista SOC N2 | Threat Intelligence · SIEM · DFIR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0A0D12;
+    --surface: #12161D;
+    --surface-2: #171C24;
+    --hairline: #232A35;
+    --text: #E8EAED;
+    --muted: #8A93A3;
+    --muted-2: #5C6577;
+    --amber: #F0932B;
+    --teal: #45B8AC;
+    --red: #E4572E;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--amber);color:#0A0D12;}
+
+  a{color:inherit;text-decoration:none;}
+
+  .container{max-width:960px;margin:0 auto;padding:0 28px;}
+
+  /* ---------- TOP BAR ---------- */
+  .topbar{
+    position:sticky;top:0;z-index:50;
+    background:rgba(10,13,18,0.9);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--hairline);
+  }
+  .topbar-inner{
+    max-width:960px;margin:0 auto;padding:14px 28px;
+    display:flex;flex-direction:column;gap:12px;
+    font-family:var(--mono);font-size:12px;color:var(--muted);
+  }
+  .topbar-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+  .topbar-status{display:flex;align-items:center;gap:8px;}
+  .dot{
+    width:7px;height:7px;border-radius:50%;background:var(--teal);
+    box-shadow:0 0 0 0 rgba(69,184,172,0.6);
+    animation:pulse 2s infinite;
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(69,184,172,0.55);}
+    70%{box-shadow:0 0 0 7px rgba(69,184,172,0);}
+    100%{box-shadow:0 0 0 0 rgba(69,184,172,0);}
+  }
+  .topbar-nav{display:flex;gap:22px;}
+  .topbar-nav a{color:var(--muted);transition:color .15s;}
+  .topbar-nav a:hover{color:var(--amber);}
+  @media(max-width:640px){.topbar-nav{display:none;}}
+
+  /* ---------- HERO / CASE HEADER ---------- */
+  .hero{padding:64px 0 40px;border-bottom:1px solid var(--hairline);}
+  .case-id{
+    font-family:var(--mono);font-size:12px;letter-spacing:.08em;
+    color:var(--muted-2);text-transform:uppercase;margin-bottom:18px;
+  }
+  .case-id span{color:var(--teal);}
+  h1{
+    font-family:var(--mono);font-weight:800;
+    font-size:clamp(34px,6vw,56px);
+    letter-spacing:-0.01em;color:var(--text);
+    margin-bottom:10px;
+  }
+  .role-line{
+    font-size:17px;color:var(--muted);
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+    margin-bottom:30px;
+  }
+  .role-line .sep{color:var(--muted-2);}
+  .role-line .accent{color:var(--amber);font-weight:600;}
+
+  .tagline{
+    font-family:var(--mono);font-size:15px;color:var(--text);
+    border-left:2px solid var(--amber);padding:4px 0 4px 16px;
+    margin-bottom:30px;max-width:560px;line-height:1.55;
+  }
+  .tagline .prompt{color:var(--muted-2);margin-right:6px;}
+
+  .terminal{
+    background:#0D1117;border:1px solid var(--hairline);border-radius:8px;
+    overflow:hidden;max-width:640px;margin-bottom:30px;
+    box-shadow:0 20px 40px -20px rgba(0,0,0,0.6);
+  }
+  .term-header{
+    display:flex;align-items:center;gap:8px;padding:10px 14px;
+    background:var(--surface-2);border-bottom:1px solid var(--hairline);
+  }
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-dot.r{background:#E4572E;}
+  .term-dot.y{background:#F0932B;}
+  .term-dot.g{background:#45B8AC;}
+  .term-title{
+    margin-left:8px;font-family:var(--mono);font-size:11.5px;color:var(--muted-2);
+  }
+  .term-body{
+    padding:16px 18px;font-family:var(--mono);font-size:12.5px;line-height:1.9;
+  }
+  .term-line{white-space:pre-wrap;}
+  .term-check{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;white-space:normal;}
+  .term-prompt-sym{color:var(--teal);}
+  .term-cmd{color:var(--text);}
+  .term-dim{color:var(--muted-2);}
+  .term-ok{color:var(--teal);}
+  .term-blank{height:8px;}
+  .term-result{color:var(--muted);}
+  .term-quote{
+    color:var(--amber);display:block;margin:4px 0 2px 0;max-width:520px;white-space:normal;
+  }
+  .term-cursor{
+    display:inline-block;width:7px;height:13px;background:var(--teal);
+    margin-left:2px;vertical-align:-2px;animation:blink 1s step-end infinite;
+  }
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+
+  .meta-strip{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    border:1px solid var(--hairline);border-radius:6px;overflow:hidden;
+    background:var(--surface);
+  }
+  .meta-item{
+    padding:16px 18px;border-right:1px solid var(--hairline);
+  }
+  .meta-item:last-child{border-right:none;}
+  .meta-label{
+    font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+    color:var(--muted-2);text-transform:uppercase;margin-bottom:6px;
+  }
+  .meta-value{font-size:14px;color:var(--text);font-weight:500;overflow-wrap:anywhere;word-break:break-word;}
+  .meta-value a:hover{color:var(--amber);}
+  .status-active{color:var(--teal);font-family:var(--mono);font-weight:600;}
+  .tlp-badge{
+    display:inline-flex;align-items:center;gap:6px;
+    font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.06em;
+    background:var(--red);color:#fff;padding:3px 8px;border-radius:3px;
+  }
+  .tlp-badge::before{content:'';width:7px;height:7px;border-radius:50%;background:#fff;}
+  .alert-ticker{
+    display:flex;flex-wrap:wrap;align-items:center;gap:10px;
+    font-family:var(--mono);font-size:11px;color:var(--muted-2);
+    border-top:1px dashed var(--hairline);padding-top:10px;
+  }
+  .alert-ticker strong{color:var(--muted);font-weight:600;}
+  .alert-ticker .sep{color:var(--hairline);}
+  .alert-ticker .validated{color:var(--teal);font-weight:700;}
+
+  /* ---------- SECTION SCAFFOLDING ---------- */
+  section{padding:56px 0;border-bottom:1px solid var(--hairline);}
+  .eyebrow{
+    font-family:var(--mono);font-size:12px;letter-spacing:.12em;
+    color:var(--amber);text-transform:uppercase;margin-bottom:10px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:'//';color:var(--muted-2);}
+  h2{
+    font-family:var(--mono);font-size:26px;font-weight:700;
+    margin-bottom:24px;color:var(--text);
+  }
+  .lede{color:var(--muted);font-size:15.5px;max-width:680px;margin-bottom:8px;}
+
+  /* ---------- ABOUT / SUMMARY ---------- */
+  .about-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:40px;}
+  @media(max-width:720px){.about-grid{grid-template-columns:1fr;}}
+  .about-text p{color:var(--muted);margin-bottom:14px;font-size:15px;}
+  .about-text strong{color:var(--text);font-weight:600;}
+  .stack-box{
+    background:var(--surface);border:1px solid var(--hairline);
+    border-radius:6px;padding:20px;
+  }
+  .stack-box h3{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;
+    color:var(--muted-2);text-transform:uppercase;margin-bottom:14px;
+  }
+  .stack-group{margin-bottom:16px;}
+  .stack-group:last-child{margin-bottom:0;}
+  .stack-group-label{font-size:12px;color:var(--teal);font-family:var(--mono);margin-bottom:8px;}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;}
+  .tag{
+    font-family:var(--mono);font-size:11.5px;color:var(--text);
+    background:var(--surface-2);border:1px solid var(--hairline);
+    padding:4px 9px;border-radius:4px;
+  }
+
+  /* ---------- ROADMAP ---------- */
+  .roadmap-track{
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;position:relative;
+    margin-top:10px;
+  }
+  .roadmap-line{
+    position:absolute;top:11px;left:0;right:0;height:2px;
+    background:linear-gradient(to right, var(--teal) 0%, var(--teal) 33%, var(--hairline) 33%, var(--hairline) 100%);
+    z-index:0;
+  }
+  @media(max-width:720px){
+    .roadmap-track{grid-template-columns:1fr;gap:26px;}
+    .roadmap-line{display:none;}
+  }
+  .roadmap-node{position:relative;z-index:1;padding-right:20px;}
+  .node-dot{
+    width:24px;height:24px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-size:11px;font-weight:700;
+    margin-bottom:16px;border:2px solid var(--hairline);background:var(--bg);
+  }
+  .node-dot.done{background:var(--teal);border-color:var(--teal);color:#0A0D12;}
+  .node-dot.current{
+    background:var(--bg);border-color:var(--amber);color:var(--amber);
+    box-shadow:0 0 0 4px rgba(240,147,43,0.15);
+    animation:pulseAmber 2s infinite;
+  }
+  @keyframes pulseAmber{
+    0%{box-shadow:0 0 0 0 rgba(240,147,43,0.35);}
+    70%{box-shadow:0 0 0 8px rgba(240,147,43,0);}
+    100%{box-shadow:0 0 0 0 rgba(240,147,43,0);}
+  }
+  .node-dot.goal{background:var(--bg);border-color:var(--muted-2);color:var(--muted-2);}
+  .node-title{font-family:var(--mono);font-size:15px;font-weight:700;margin-bottom:4px;}
+  .node-status{
+    font-family:var(--mono);font-size:10px;letter-spacing:.08em;
+    text-transform:uppercase;margin-bottom:10px;display:inline-block;
+    padding:2px 7px;border-radius:3px;
+  }
+  .node-status.done{color:var(--teal);background:rgba(69,184,172,0.1);}
+  .node-status.current{color:var(--amber);background:rgba(240,147,43,0.1);}
+  .node-status.goal{color:var(--muted-2);background:var(--surface-2);}
+  .node-desc{font-size:13.5px;color:var(--muted);max-width:260px;}
+
+  /* ---------- TIMELINE (EXPERIENCE) ---------- */
+  .timeline{position:relative;padding-left:28px;}
+  .timeline::before{
+    content:'';position:absolute;left:5px;top:6px;bottom:6px;width:1px;
+    background:var(--hairline);
+  }
+  .tl-entry{position:relative;padding-bottom:38px;}
+  .tl-entry:last-child{padding-bottom:0;}
+  .tl-dot{
+    position:absolute;left:-28px;top:5px;width:11px;height:11px;
+    border-radius:50%;background:var(--surface-2);border:2px solid var(--muted-2);
+  }
+  .tl-entry.current .tl-dot{background:var(--amber);border-color:var(--amber);}
+  .tl-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;margin-bottom:4px;}
+  .tl-role{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);}
+  .tl-tag{
+    font-family:var(--mono);font-size:10px;letter-spacing:.06em;
+    text-transform:uppercase;padding:2px 7px;border-radius:3px;
+    background:var(--surface-2);color:var(--muted);border:1px solid var(--hairline);
+  }
+  .tl-tag.active{color:var(--amber);border-color:rgba(240,147,43,0.35);background:rgba(240,147,43,0.08);}
+  .tl-company{font-size:14px;color:var(--teal);margin-bottom:2px;}
+  .tl-dates{font-family:var(--mono);font-size:12px;color:var(--muted-2);margin-bottom:12px;}
+  .tl-bullets{list-style:none;}
+  .tl-bullets li{
+    font-size:14px;color:var(--muted);margin-bottom:7px;padding-left:16px;position:relative;
+  }
+  .tl-bullets li::before{content:'›';position:absolute;left:0;color:var(--muted-2);}
+
+  /* ---------- CERTIFICATIONS ---------- */
+  .cert-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;}
+  .cert-card{
+    background:var(--surface);border:1px solid var(--hairline);border-radius:6px;
+    padding:16px 18px;display:flex;gap:12px;align-items:flex-start;
+  }
+  .cert-mark{font-family:var(--mono);color:var(--teal);font-size:16px;line-height:1;margin-top:2px;}
+  .cert-name{font-size:13.5px;color:var(--text);font-weight:500;}
+
+  /* ---------- EDUCATION ---------- */
+  .edu-item{
+    display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+    padding:16px 0;border-bottom:1px solid var(--hairline);
+  }
+  .edu-item:last-child{border-bottom:none;}
+  .edu-name{font-size:14.5px;color:var(--text);font-weight:600;margin-bottom:3px;}
+  .edu-degree{font-size:13.5px;color:var(--muted);}
+  .edu-dates{font-family:var(--mono);font-size:12px;color:var(--muted-2);white-space:nowrap;}
+
+  /* ---------- FOOTER / CONTACT ---------- */
+  footer{padding:56px 0 72px;}
+  .contact-grid{
+    display:flex;flex-wrap:wrap;gap:14px;margin-top:20px;
+  }
+  .contact-btn{
+    font-family:var(--mono);font-size:13px;
+    border:1px solid var(--hairline);border-radius:6px;
+    padding:12px 18px;background:var(--surface);
+    display:flex;align-items:center;gap:10px;transition:border-color .15s,color .15s;
+  }
+  .contact-btn:hover{border-color:var(--amber);color:var(--amber);}
+  .field-counter{
+    margin-top:34px;font-family:var(--mono);font-size:12px;color:var(--muted-2);
+  }
+  .field-counter span{color:var(--teal);}
+  .foot-note{margin-top:40px;font-size:12px;color:var(--muted-2);font-family:var(--mono);}
+
+  /* ---------- RESPONSIVE ---------- */
+  @media(max-width:600px){
+    .container{padding:0 18px;}
+    .topbar-inner{padding:12px 18px;}
+    .hero{padding:44px 0 32px;}
+    section{padding:40px 0;}
+    .meta-strip{grid-template-columns:1fr 1fr;}
+    .meta-item{padding:13px 14px;}
+    .meta-item:nth-child(2n){border-right:none;}
+    .term-body{padding:14px;font-size:11.5px;line-height:1.8;}
+    .term-header{padding:9px 12px;}
+    .alert-ticker{font-size:10px;gap:7px;}
+    .cert-grid{grid-template-columns:1fr;}
+    .contact-grid{flex-direction:column;}
+    .contact-btn{justify-content:flex-start;}
+    h2{font-size:22px;}
+  }
+  @media(max-width:400px){
+    .meta-strip{grid-template-columns:1fr;}
+    .meta-item{border-right:none !important;border-bottom:1px solid var(--hairline);}
+    .meta-item:last-child{border-bottom:none;}
+    .role-line{font-size:15px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-row">
+      <div class="topbar-status"><span class="dot"></span> SOC://erick-adriano — online</div>
+      <span class="tlp-badge">TLP:RED</span>
+    </div>
+    <div class="alert-ticker">
+      <span>ALERT-ID: <strong>RESUME-2026-0701</strong></span>
+      <span class="sep">|</span>
+      <span>SHA256: <strong>9f2a1c7e...44b7d0</strong></span>
+      <span class="sep">|</span>
+      <span>SRC-IP: <strong>10.0.42.17</strong></span>
+      <span class="sep">|</span>
+      <span class="validated">✓ VALIDADO</span>
+    </div>
+    <nav class="topbar-nav">
+      <a href="#sobre">sobre</a>
+      <a href="#trajetoria">trajetória</a>
+      <a href="#experiencia">experiência</a>
+      <a href="#certificacoes">certificações</a>
+      <a href="#contato">contato</a>
+    </nav>
+  </div>
+</div>
+
+<div class="container">
+
+  <header class="hero">
+    <div class="case-id">Case #ERICK-2026 · Analista de Segurança Ativo · Última atualização <span>jul/2026</span></div>
+    <h1>Erick Adriano</h1>
+    <div class="role-line">
+      <span class="accent">Analista SOC N2</span><span class="sep">·</span>
+      Threat Intelligence<span class="sep">·</span>SIEM<span class="sep">·</span>OSINT<span class="sep">·</span>Cloud Security
+    </div>
+
+    <div class="terminal">
+      <div class="term-header">
+        <span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>
+        <span class="term-title">erick@soc — zsh</span>
+      </div>
+      <div class="term-body">
+        <div class="term-line"><span class="term-prompt-sym">$</span> <span class="term-cmd">chkrootkit -x erick_adriano</span></div>
+        <div class="term-line term-dim">ROOTDIR is `/home/erick'</div>
+        <div class="term-line term-check"><span>Checking `triagem de alertas`</span><span class="term-ok">not infected</span></div>
+        <div class="term-line term-check"><span>Checking `engenharia de siem`</span><span class="term-ok">not infected</span></div>
+        <div class="term-line term-check"><span>Checking `threat hunting`</span><span class="term-ok">not infected</span></div>
+        <div class="term-line term-check"><span>Checking `resposta a incidentes`</span><span class="term-ok">not infected</span></div>
+        <div class="term-line term-check"><span>Checking `forense digital`</span><span class="term-ok">not infected</span></div>
+        <div class="term-line term-check"><span>Checking `prontidão csirt`</span><span class="term-ok">not infected</span></div>
+        <div class="term-blank"></div>
+        <div class="term-line term-result">Sistema limpo. Nenhum rootkit encontrado.</div>
+        <div class="term-blank"></div>
+        <div class="term-line"><span class="term-prompt-sym">$</span> <span class="term-cmd">echo $PROFILE_SUMMARY</span></div>
+        <div class="term-line term-quote">"Não paro na triagem do alerta — persigo a causa raiz, documento a evidência e construo a resposta."</div>
+        <div class="term-line"><span class="term-prompt-sym">$</span><span class="term-cursor"></span></div>
+      </div>
+    </div>
+
+    <div class="meta-strip">
+      <div class="meta-item">
+        <div class="meta-label">Localização</div>
+        <div class="meta-value">São Paulo, SP — Brasil</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Status atual</div>
+        <div class="meta-value status-active">● MONITORANDO</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Especialização em curso</div>
+        <div class="meta-value">Incident Response &amp; DFIR</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Contato</div>
+        <div class="meta-value"><a href="mailto:erick.nuness777@gmail.com">erick.nuness777@gmail.com</a></div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Classificação</div>
+        <div class="meta-value"><span class="tlp-badge">TLP:RED</span></div>
+      </div>
+    </div>
+  </header>
+
+  <section id="sobre">
+    <div class="eyebrow">resumo do caso</div>
+    <h2>Sobre</h2>
+    <div class="about-grid">
+      <div class="about-text">
+        <p>Analista de Cibersegurança Pleno (<strong>SOC N2</strong>) com atuação forte em Engenharia de Detecção, Threat Intelligence e Resposta a Incidentes. Experiência na estruturação e operação de SOCs em ambientes de alta criticidade — da configuração de ferramentas à criação de processos estratégicos de defesa.</p>
+        <p><strong>Engenharia de SIEM (Wazuh):</strong> criação de regras de detecção personalizadas (XML/Regex), decodificadores e dashboards analíticos alinhados ao framework MITRE ATT&amp;CK.</p>
+        <p><strong>CTI &amp; OSINT:</strong> monitoramento proativo de superfície de ataque com Shodan, Censys e Google Dorking, além de investigação de vazamentos em Deep/Dark Web para redução preventiva de risco.</p>
+        <p><strong>Maturidade operacional:</strong> criação de Playbooks, SOPs e Bases de Conhecimento, com foco em padronizar o atendimento de incidentes, reduzir o MTTR e mitigar a fadiga de alertas por falsos-positivos.</p>
+        <p>Background sólido em administração de sistemas Linux, trazendo uma visão técnica profunda de logs, comportamento de processos e redes — base direta para investigações forenses.</p>
+      </div>
+      <div class="stack-box">
+        <h3>Stack técnico</h3>
+        <div class="stack-group">
+          <div class="stack-group-label">SIEM &amp; Detecção</div>
+          <div class="tags">
+            <span class="tag">Wazuh</span><span class="tag">Google Chronicle</span>
+            <span class="tag">Securonix</span><span class="tag">Stellar</span>
+          </div>
+        </div>
+        <div class="stack-group">
+          <div class="stack-group-label">Intelligence &amp; Recon</div>
+          <div class="tags">
+            <span class="tag">OSINT</span><span class="tag">CTI</span>
+            <span class="tag">Mapeamento de IoCs</span><span class="tag">Threat Hunting</span>
+          </div>
+        </div>
+        <div class="stack-group">
+          <div class="stack-group-label">Resposta</div>
+          <div class="tags">
+            <span class="tag">Incident Response</span><span class="tag">Playbook Design</span>
+            <span class="tag">Digital Forensics</span>
+          </div>
+        </div>
+        <div class="stack-group">
+          <div class="stack-group-label">Cloud &amp; Rede</div>
+          <div class="tags">
+            <span class="tag">Microsoft Azure</span><span class="tag">Detecção de malware</span>
+            <span class="tag">VPN</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="trajetoria">
+    <div class="eyebrow">rota de especialização</div>
+    <h2>Para onde este caso está indo</h2>
+    <p class="lede" style="margin-bottom:30px;">Trajetória construída em SOC, com direção clara: consolidar Incident Response &amp; DFIR e evoluir para atuação especializada em CSIRT.</p>
+
+    <div class="roadmap-track">
+      <div class="roadmap-line"></div>
+
+      <div class="roadmap-node">
+        <div class="node-dot done">✓</div>
+        <div class="node-status done">Concluído</div>
+        <div class="node-title">Operação SOC</div>
+        <div class="node-desc">N1 → N2. Monitoramento, triagem, threat hunting e engenharia de detecção em SIEM (Wazuh, Securonix, Stellar, Rapid7).</div>
+      </div>
+
+      <div class="roadmap-node">
+        <div class="node-dot current">→</div>
+        <div class="node-status current">Em andamento</div>
+        <div class="node-title">Incident Response &amp; DFIR</div>
+        <div class="node-desc">Aprofundamento em resposta a incidentes e forense digital, saindo da detecção para a investigação e contenção ativa.</div>
+      </div>
+
+      <div class="roadmap-node">
+        <div class="node-dot goal">◎</div>
+        <div class="node-status goal">Próximo objetivo</div>
+        <div class="node-title">Especialista CSIRT</div>
+        <div class="node-desc">Atuação em time de resposta a incidentes de segurança, coordenando resposta, forense e lições aprendidas em escala.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="experiencia">
+    <div class="eyebrow">log de eventos</div>
+    <h2>Experiência</h2>
+
+    <div class="timeline">
+
+      <div class="tl-entry current">
+        <div class="tl-dot"></div>
+        <div class="tl-head">
+          <span class="tl-role">Analista SOC</span>
+          <span class="tl-tag active">atual</span>
+        </div>
+        <div class="tl-company">Under Protection</div>
+        <div class="tl-dates">junho de 2026 — presente · Pinhais, PR</div>
+      </div>
+
+      <div class="tl-entry">
+        <div class="tl-dot"></div>
+        <div class="tl-head"><span class="tl-role">Analista de Ciberdefesa</span></div>
+        <div class="tl-company">ISH Tecnologia</div>
+        <div class="tl-dates">agosto de 2025 — fevereiro de 2026 (7 meses) · São Paulo, SP</div>
+        <ul class="tl-bullets">
+          <li>Atuação como Analista SOC N1 alocado em cliente de infraestrutura crítica nacional, garantindo monitoramento contínuo e estabilidade do ambiente de ciberdefesa.</li>
+          <li>Monitoramento, triagem em tempo real e análise de alta volumetria de alertas usando SIEM Securonix e detecção de ameaças de rede (Lumu).</li>
+          <li>Execução de Health Checks diários e periódicos para validar integrações, ingestão de fontes de log e cobertura de segurança.</li>
+          <li>Investigação inicial de eventos suspeitos, mitigação de falsos-positivos e escalonamento preciso de incidentes críticos para N2/N3.</li>
+          <li>Elaboração de passagens de turno e relatórios operacionais detalhados, registrando anomalias e pontos de atenção para continuidade do SOC.</li>
+        </ul>
+      </div>
+
+      <div class="tl-entry">
+        <div class="tl-dot"></div>
+        <div class="tl-head"><span class="tl-role">Analista SOC T1</span></div>
+        <div class="tl-company">Under Protection</div>
+        <div class="tl-dates">maio de 2024 — agosto de 2025 (1 ano 4 meses) · Pinhais, PR</div>
+        <ul class="tl-bullets">
+          <li>Monitoramento contínuo e análise de eventos de segurança em SOC 24x7 via SIEM Rapid7 e Stellar.</li>
+          <li>Análise forense de logs de sistemas, redes e aplicações para identificação de ameaças e IOCs.</li>
+          <li>Cyber Threat Hunting proativo baseado em comportamento anômalo de contas, ativos e tráfego de rede.</li>
+          <li>Triagem e escalonamento estruturado de incidentes críticos, com coordenação direta com clientes para mitigação de riscos.</li>
+          <li>Investigação de alertas com foco em falsos-positivos e otimização de MTTR.</li>
+        </ul>
+      </div>
+
+      <div class="tl-entry">
+        <div class="tl-dot"></div>
+        <div class="tl-head"><span class="tl-role">Analista de Segurança da Informação JR (SOC)</span></div>
+        <div class="tl-company">Diazero Security</div>
+        <div class="tl-dates">dezembro de 2023 — maio de 2024 (6 meses) · São Paulo, SP</div>
+        <ul class="tl-bullets">
+          <li>Monitoramento, detecção e resposta a incidentes com forte foco em ambientes monitorados por SIEM.</li>
+          <li>Customização de regras de detecção (XML/Regex) e decodificadores no Wazuh para otimizar a visibilidade de segurança.</li>
+          <li>Threat Hunting e Threat Intelligence (CTI), aplicando OSINT em investigação de incidentes e mapeamento de superfície de ataque.</li>
+          <li>Gestão de vulnerabilidades com Nessus e análise de telemetria via Cloudflare, Inopli, Loki e Google Chronicle.</li>
+          <li>Elaboração de Playbooks/SOPs para padronização e automação de processos de defesa.</li>
+        </ul>
+      </div>
+
+      <div class="tl-entry">
+        <div class="tl-dot"></div>
+        <div class="tl-head"><span class="tl-role">Estagiário em Segurança da Informação</span></div>
+        <div class="tl-company">Banco Toyota do Brasil</div>
+        <div class="tl-dates">julho de 2023 — dezembro de 2023 (6 meses) · São Paulo, SP</div>
+        <ul class="tl-bullets">
+          <li>Monitoramento e análise de alertas de fraude, vazamento de dados e ameaças à marca via plataforma Axur.</li>
+          <li>Detecção, triagem e resposta a incidentes usando Crowdstrike EDR para análise de endpoints e contenção.</li>
+          <li>Gestão de ativos e análise de vulnerabilidades corporativas com Qualys.</li>
+          <li>Administração de identidades e governança de dados com OneTrust e Varonis (privilégios, auditoria de pastas e AD).</li>
+          <li>Apoio na implementação de políticas de segurança e execução de testes de phishing educativo.</li>
+        </ul>
+      </div>
+
+      <div class="tl-entry">
+        <div class="tl-dot"></div>
+        <div class="tl-head"><span class="tl-role">Analista de Redes (Blue Team)</span></div>
+        <div class="tl-company">Aser Security</div>
+        <div class="tl-dates">janeiro de 2023 — julho de 2023 (7 meses) · São Paulo, SP</div>
+        <ul class="tl-bullets">
+          <li>Configuração, gerenciamento e monitoramento de ativos de segurança de rede e firewalls corporativos.</li>
+          <li>Monitoramento de eventos e tráfego de rede focado em detecção de atividades anômalas e resposta a incidentes.</li>
+          <li>Análise de logs de rede e infraestrutura para identificação de vetores de ataque e violações de conformidade.</li>
+          <li>Administração de roteamento de redes e apoio na implementação de políticas de segurança perimetral.</li>
+        </ul>
+      </div>
+
+      <div class="tl-entry">
+        <div class="tl-dot"></div>
+        <div class="tl-head"><span class="tl-role">Linux Sysadmin</span></div>
+        <div class="tl-company">Mundo Open Tecnologia</div>
+        <div class="tl-dates">abril de 2022 — janeiro de 2023 (10 meses) · São Paulo</div>
+        <ul class="tl-bullets">
+          <li>Administração, hardening e gerenciamento de servidores Linux em produção.</li>
+          <li>Desenvolvimento de automações e scripts em Shell Script para otimização de processos e análise de dados.</li>
+          <li>Provisionamento de infraestrutura: SAMBA, Nginx/Apache (WHM/CPanel), Proxy SQUID (DNS, DHCP, FTP, OpenVPN).</li>
+          <li>Administração de servidores de e-mail (Postfix, Zimbra) e bancos de dados (MariaDB, MySQL, PostgreSQL).</li>
+          <li>Implementação de firewalls e roteadores perimetrais (Mikrotik, Fortigate, pfSense).</li>
+          <li>Monitoramento centralizado de ativos com Zabbix e Grafana.</li>
+        </ul>
+      </div>
+
+      <div class="tl-entry">
+        <div class="tl-dot"></div>
+        <div class="tl-head"><span class="tl-role">Assistente de TI</span></div>
+        <div class="tl-company">LRS Tecnologia</div>
+        <div class="tl-dates">maio de 2021 — fevereiro de 2022 (10 meses) · São Paulo</div>
+        <ul class="tl-bullets">
+          <li>Monitoramento de infraestrutura, storages, servidores (Blade, Tape Library Lenovo/IBM) e backups via Zabbix e Grafana.</li>
+          <li>Criação, validação e execução de jobs de backup com Acronis e Veeam.</li>
+          <li>Desenvolvimento de templates customizados no Zabbix para monitoramento avançado de hardware e rede.</li>
+          <li>Instalação física e configuração lógica de equipamentos de data center.</li>
+        </ul>
+      </div>
+
+      <div class="tl-entry">
+        <div class="tl-dot"></div>
+        <div class="tl-head"><span class="tl-role">Estagiário</span></div>
+        <div class="tl-company">Faculdades Integradas Rio Branco</div>
+        <div class="tl-dates">fevereiro de 2019 — novembro de 2020 (1 ano 10 meses) · São Paulo e Região</div>
+        <ul class="tl-bullets">
+          <li>Suporte técnico e manutenção física e lógica de computadores e estações de trabalho.</li>
+          <li>Instalação e suporte a sistemas operacionais (Windows e Linux) e softwares corporativos (TOTVS, Adobe, Microsoft Office).</li>
+          <li>Administração de infraestrutura de redes locais e ingresso de máquinas em domínio de Active Directory.</li>
+          <li>Gestão de contas de e-mail corporativo (Google Workspace) e centrais telefônicas PABX.</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="certificacoes">
+    <div class="eyebrow">credenciais verificadas</div>
+    <h2>Certificações</h2>
+    <div class="cert-grid">
+      <div class="cert-card"><div class="cert-mark">✓</div><div class="cert-name">CSI Linux Certified Investigator</div></div>
+      <div class="cert-card"><div class="cert-mark">✓</div><div class="cert-name">Security Practices with Chronicle SIEM</div></div>
+      <div class="cert-card"><div class="cert-mark">✓</div><div class="cert-name">Certified Red Team Analyst (CRTA)</div></div>
+      <div class="cert-card"><div class="cert-mark">✓</div><div class="cert-name">IA Aplicada para Segurança Ofensiva</div></div>
+      <div class="cert-card"><div class="cert-mark">✓</div><div class="cert-name">NSE 1, 2 &amp; 3 (Fortinet)</div></div>
+      <div class="cert-card"><div class="cert-mark">✓</div><div class="cert-name">SC-900 &amp; SYCP</div></div>
+      <div class="cert-card"><div class="cert-mark">✓</div><div class="cert-name">AZ-900 (Microsoft Azure Fundamentals)</div></div>
+      <div class="cert-card"><div class="cert-mark">◎</div><div class="cert-name">CompTIA Security+ — em preparação</div></div>
+      <div class="cert-card"><div class="cert-mark">◎</div><div class="cert-name">LetsDefend — SOC Analyst Learning Path — em andamento</div></div>
+      <div class="cert-card"><div class="cert-mark">◎</div><div class="cert-name">LetsDefend — Threat Hunting — em andamento</div></div>
+    </div>
+  </section>
+
+  <section id="formacao">
+    <div class="eyebrow">base de conhecimento</div>
+    <h2>Formação acadêmica</h2>
+    <div class="edu-item">
+      <div>
+        <div class="edu-name">Faculdade VINCIT</div>
+        <div class="edu-degree">Pós-graduação Lato Sensu — Segurança Ofensiva e Inteligência Cibernética</div>
+      </div>
+      <div class="edu-dates">ago/2025 — mai/2026</div>
+    </div>
+    <div class="edu-item">
+      <div>
+        <div class="edu-name">Faculdades Integradas Campos Salles</div>
+        <div class="edu-degree">Bacharelado — Sistemas de Informação</div>
+      </div>
+      <div class="edu-dates">ago/2018 — ago/2022</div>
+    </div>
+    <div class="edu-item">
+      <div>
+        <div class="edu-name">Etec Jaraguá</div>
+        <div class="edu-degree">Curso Técnico Integrado — Eletrotécnica</div>
+      </div>
+      <div class="edu-dates">fev/2013 — dez/2015</div>
+    </div>
+  </section>
+
+  <footer id="contato">
+    <div class="eyebrow">encerrar chamado</div>
+    <h2>Contato</h2>
+    <p class="lede">Aberto a oportunidades em Incident Response, DFIR e times de CSIRT.</p>
+    <div class="contact-grid">
+      <a class="contact-btn" href="mailto:erick.nuness777@gmail.com">✉ erick.nuness777@gmail.com</a>
+      <a class="contact-btn" href="tel:+5511962223137">☎ (11) 96222-3137</a>
+      <a class="contact-btn" href="https://www.linkedin.com/in/erick-ans" target="_blank" rel="noopener">in/ linkedin.com/in/erick-ans</a>
+    </div>
+    <div class="field-counter">tempo em campo desde mai/2021 — <span id="uptime">calculando…</span></div>
+    <div class="foot-note">EOF — obrigado por revisar o caso.</div>
+  </footer>
+
+</div>
+
+<script>
+  const start = new Date('2021-05-01T00:00:00');
+  function updateUptime(){
+    const now = new Date();
+    const diffMs = now - start;
+    const years = diffMs / (1000*60*60*24*365.25);
+    const wholeYears = Math.floor(years);
+    const months = Math.floor((years - wholeYears) * 12);
+    document.getElementById('uptime').textContent = wholeYears + ' anos, ' + months + ' meses de operação contínua';
+  }
+  updateUptime();
+</script>
+
+</body>
+</html>
